@@ -1,24 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import HomeScreen from './components/HomeScreen';
+import MyListScreen from './components/MyListScreen';
+import MovieDetails from './components/MovieDetailsScreen'; // Import the MovieDetails component
 
 function App() {
+  const [myList, setMyList] = useState({
+    toWatch: [],
+    watched: [],
+  });
+
+  const addToWatchList = (movie) => {
+    setMyList((prevList) => ({
+      ...prevList,
+      toWatch: [...prevList.toWatch, movie],
+    }));
+  };
+
+  const markAsWatched = (movie) => {
+    setMyList((prevList) => ({
+      ...prevList,
+      watched: [...prevList.watched, movie],
+      toWatch: prevList.toWatch.filter(item => item.id !== movie.id),
+    }));
+  };
+
+  const removeFromList = (movie, listType) => {
+    setMyList((prevList) => ({
+      ...prevList,
+      [listType]: prevList[listType].filter(item => item.id !== movie.id),
+    }));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<HomeScreen addToWatchList={addToWatchList} markAsWatched={markAsWatched} />} />
+        <Route path="/my-list" element={<MyListScreen myList={myList} markAsWatched={markAsWatched} removeFromList={removeFromList} />} />
+        <Route path="/movie/:id" element={<MovieDetails />} />
+      </Routes>
+    </Router>
   );
 }
 
